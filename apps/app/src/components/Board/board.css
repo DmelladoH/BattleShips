@@ -1,0 +1,29 @@
+
+.board{
+   display: grid;
+} 
+
+.board-row{
+    display: flex;
+}
+
+.a{
+    display: flex;
+}
+
+.board-title{
+    display: grid;
+    grid-template-columns: repeat(11, 1fr);
+}
+
+span{
+    width: 50px;
+    height: 50px;
+}
+
+.board-cell{
+    cursor: pointer;
+    width: 50px;
+    height: 50px;
+    border: 1px solid red;
+}
