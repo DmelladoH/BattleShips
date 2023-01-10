@@ -14,13 +14,16 @@ function App() {
 
   const createGame = () => {
     socket.emit('createGame', (roomID: string) => {
-      console.log(typeof roomID)
       console.log(roomID)
     })
   }
 
   const joinGame = () => {
-    socket.emit('joinGame', {gameID})
+    socket.emit('joinGame', gameID, (userid: string) =>{
+      console.log(gameID)
+      console.log( {userid})
+
+    })
   }
 
   const handleAttack = (coordenades: string) => {

@@ -3,7 +3,7 @@ const cors = require('cors')
 const crypto = require('crypto');
 
 
-const PORT = process.env.PORT || 3000;
+const PORT = 3000;
 const socketio = require('socket.io');
 const app = express();
 
@@ -13,7 +13,14 @@ app.use(cors())
 
 
 const currentGames ={
-
+    game1: {
+        user1:{
+            board: [],
+        }, 
+        user2:{
+            board: [],
+        }
+    },
 }
 
 const server = app.listen(PORT, () => {
@@ -29,28 +36,37 @@ const io = require('socket.io')(server, {
   io.on('connection', (socket) => {
 
     socket.on('createGame', (callback) => {
-        const roomID = crypto.randomUUID()
-        socket.join(roomID)
-        currentGames[roomID] = { players: 1 }
-        console.log('user created a game: ', roomID)
-        callback(roomID)
+        const gameID = crypto.randomUUID()
+        const userID = crypto.randomUUID()
+        socket.join(gameID)
+        currentGames[gameID] = {players: [userID]}
+        console.log('user created a game: ', gameID)
+        callback({roomID, userID})
     })
 
-    socket.on('joinGame', ({ gameID }) => {
+    socket.on('joinGame', ( gameID, callback) => {
+        console.log('user joined to ', gameID)
         if(!currentGames[gameID]){
             console.log('game does not exist')
             socket.emit('err-message', 'Game does not exist')   
             return
         }
-        if(currentGames[gameID].players >= 2){
+        if(Object.keys(obj).length >= 2){
             console.log('game is full')
             socket.emit('err-message', 'Game is full')   
             return
          }
+        const userID = crypto.randomUUID()
         console.log('user joined to ', gameID)
         socket.join(gameID)
-        currentGames[gameID].players++
+        currentGames[gameID].players.push(userID)
+        callback({userID})
         socket.emit('message','Welcome to the game')
         socket.broadcast.to(gameID).emit('message', 'Another player joined the game')
+    })
+
+    socket.on('sendBoard', (gameId, user, board) => {
+        const game = currentGames[gameId]
+        game[user].board = board      
     })
 })
